@@ -10,8 +10,8 @@ app.use(express.json());  // To parse JSON bodies
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'Batman@123',
-    database: 'web'
+    password: '5247',
+    database: 'sportshub'
 });
 
 // Root Endpoint
@@ -72,6 +72,17 @@ app.get('/api/teams', (req, res) => {
 // Get players
 app.get('/api/players', (req, res) => {
     db.query('SELECT * FROM Players', (err, results) => {
+        if (err) {
+            return res.status(500).send('Database query failed');
+        }
+        res.json(results);
+    });
+});
+
+// get player of sport by sending sports id
+app.get('/api/playersOfSport', (req, res) => {
+    const sqlQuery = `SELECT * FROM Players WHERE team_id IN (SELECT team_id FROM teams WHERE sport_id = ${req.query.sport_id})`;
+    db.query(sqlQuery, (err, results) => {
         if (err) {
             return res.status(500).send('Database query failed');
         }
